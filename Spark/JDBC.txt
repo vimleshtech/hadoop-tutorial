@@ -1,0 +1,171 @@
+Establish connectivity to MySQL
+This example queries MySQL using its JDBC driver.
+
+Step 1: Check that the JDBC driver is available
+This statement checks that the driver class exists in your classpath. You can use the %scala magic command to test this in other notebook types, such as Python.
+
+Copy to clipboardCopy
+Class.forName("org.mariadb.jdbc.Driver") // |DBR| 3.4 and above
+
+Class.forName("com.mysql.jdbc.Driver") // |DBR| 3.3 and below
+Step 2: Create the JDBC URL
+Copy to clipboardCopy
+val jdbcHostname = "hostname"
+val jdbcPort = 3306
+val jdbcDatabase = "<database>"
+
+// Create the JDBC URL without passing in the user and password parameters.
+val jdbcUrl = s"jdbc:mysql://${jdbcHostname}:${jdbcPort}/${jdbcDatabase}"
+
+// Create a Properties() object to hold the parameters.
+import java.util.Properties
+val connectionProperties = new Properties()
+
+connectionProperties.put("user", s"${jdbcUsername}")
+connectionProperties.put("password", s"${jdbcPassword}")
+Step 3: Check connectivity to the MySQL database
+Copy to clipboardCopy
+import java.sql.DriverManager
+val connection = DriverManager.getConnection(jdbcUrl, jdbcUsername, jdbcPassword)
+connection.isClosed()
+Establish connectivity to SQL Server
+This example queries SQL Server using its JDBC driver.
+
+Step 1: Check that the JDBC driver is available
+Copy to clipboardCopy
+Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver")
+Step 2: Create the JDBC URL
+Copy to clipboardCopy
+val jdbcHostname = "<hostname>"
+val jdbcPort = 1433
+val jdbcDatabase = "<database>"
+
+// Create the JDBC URL without passing in the user and password parameters.
+val jdbcUrl = s"jdbc:sqlserver://${jdbcHostname}:${jdbcPort};database=${jdbcDatabase}"
+
+// Create a Properties() object to hold the parameters.
+import java.util.Properties
+val connectionProperties = new Properties()
+
+connectionProperties.put("user", s"${jdbcUsername}")
+connectionProperties.put("password", s"${jdbcPassword}")
+Step 3: Check connectivity to the SQLServer database
+Copy to clipboardCopy
+val driverClass = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
+connectionProperties.setProperty("Driver", driverClass)
+Read data from JDBC
+This section loads data from a database table. This uses a single JDBC connection to pull the table into the Spark environment. For parallel reads, see Manage parallelism.
+
+Copy to clipboardCopy
+val employees_table = spark.read.jdbc(jdbcUrl, "employees", connectionProperties)
+Spark automatically reads the schema from the database table and maps its types back to Spark SQL types.
+
+Copy to clipboardCopy
+employees_table.printSchema
+You can run queries against this JDBC table:
+
+Copy to clipboardCopy
+display(employees_table.select("age", "salary").groupBy("age").avg("salary"))
+Write data to JDBC
+This section shows how to write data to a database from an existing Spark SQL table named diamonds.
+
+Copy to clipboardCopy
+%sql -- quick test that this test table exists
+select * from diamonds limit 5
+The following code saves the data into a database table named diamonds. Using column names that are reserved keywords can trigger an exception. The example table has column named table, so you can rename it with withColumnRenamed() prior to pushing it to the JDBC API.
+
+Copy to clipboardCopy
+spark.table("diamonds").withColumnRenamed("table", "table_number")
+     .write
+     .jdbc(jdbcUrl, "diamonds", connectionProperties)
+Spark automatically creates a database table with the appropriate schema determined from the DataFrame schema.
+
+The default behavior is to create a new table and to throw an error message if a table with the same name already exists. You can use the Spark SQL SaveMode feature to change this behavior. For example, here’s how to append more rows to the table:
+
+Copy to clipboardCopy
+import org.apache.spark.sql.SaveMode
+
+spark.sql("select * from diamonds limit 10").withColumnRenamed("table", "table_number")
+     .write
+     .mode(SaveMode.Append) // <--- Append to the existing table
+     .jdbc(jdbcUrl, "diamonds", connectionProperties)
+You can also overwrite an existing table:
+
+Copy to clipboardCopy
+spark.table("diamonds").withColumnRenamed("table", "table_number")
+     .write
+     .mode(SaveMode.Overwrite) // <--- Overwrite the existing table
+     .jdbc(jdbcUrl, "diamonds", connectionProperties)
+Push down a query to the database engine
+You can push down an entire query to the database and return just the result. The table parameter identifies the JDBC table to read. You can use anything that is valid in a SQL query FROM clause.
+
+Copy to clipboardCopy
+// Note: The parentheses are required.
+val pushdown_query = "(select * from employees where emp_no < 10008) emp_alias"
+val df = spark.read.jdbc(url=jdbcUrl, table=pushdown_query, properties=connectionProperties)
+display(df)
+Push down optimization
+In addition to ingesting an entire table, you can push down a query to the database to leverage it for processing, and return only the results.
+
+Copy to clipboardCopy
+// Explain plan with no column selection returns all columns
+spark.read.jdbc(jdbcUrl, "diamonds", connectionProperties).explain(true)
+You can prune columns and pushdown query predicates to the database with DataFrame methods.
+
+Copy to clipboardCopy
+// Explain plan with column selection will prune columns and just return the ones specified
+// Notice that only the 3 specified columns are in the explain plan
+spark.read.jdbc(jdbcUrl, "diamonds", connectionProperties).select("carat", "cut", "price").explain(true)
+Copy to clipboardCopy
+// You can push query predicates down too
+// Notice the filter at the top of the physical plan
+spark.read.jdbc(jdbcUrl, "diamonds", connectionProperties).select("carat", "cut", "price").where("cut = 'Good'").explain(true)
+
+
+
+
+A Scala, JDBC, and MySQL example
+Without any further introduction, here's the source code for a complete Scala class (an object, actually) that connects to a MySQL database using nothing but plain old JDBC. In this example I'm connecting to a MySQL database server on my local computer, and then running a SQL SELECT query against the user table of the mysql database:
+
+package jdbc
+
+import java.sql.DriverManager
+import java.sql.Connection
+
+/**
+ * A Scala JDBC connection example by Alvin Alexander,
+ * https://alvinalexander.com
+ */
+object ScalaJdbcConnectSelect {
+
+  def main(args: Array[String]) {
+    // connect to the database named "mysql" on the localhost
+    val driver = "com.mysql.jdbc.Driver"
+    val url = "jdbc:mysql://localhost/mysql"
+    val username = "root"
+    val password = "root"
+
+    // there's probably a better way to do this
+    var connection:Connection = null
+
+    try {
+      // make the connection
+      Class.forName(driver)
+      connection = DriverManager.getConnection(url, username, password)
+
+      // create the statement, and run the select query
+      val statement = connection.createStatement()
+      val resultSet = statement.executeQuery("SELECT host, user FROM user")
+      while ( resultSet.next() ) {
+        val host = resultSet.getString("host")
+        val user = resultSet.getString("user")
+        println("host, user = " + host + ", " + user)
+      }
+    } catch {
+      case e => e.printStackTrace
+    }
+    connection.close()
+  }
+
+}
+

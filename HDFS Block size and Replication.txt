@@ -1,0 +1,60 @@
+How to Configure Replication Factor and Block Size for HDFS?
+Hadoop Distributed File System (HDFS) stores files as data blocks and distributes these blocks across the entire cluster. As HDFS was designed to be fault-tolerant and to run on commodity hardware, blocks are replicated a number of times to ensure high data availability. The replication factor is a property that can be set in the HDFS configuration file that will allow you to adjust the global replication factor for the entire cluster. For each block stored in HDFS, there will be n – 1 duplicated blocks distributed across the cluster. For example, if the replication factor was set to 3 (default value in HDFS) there would be one original block and two replicas.
+
+
+Open the hdfs-site.xml file. This file is usually found in the conf/ folder of the Hadoop installation directory. Change or add the following property to hdfs-site.xml:
+
+<property> 
+<name>dfs.replication<name> 
+<value>3<value> 
+<description>Block Replication<description> 
+<property>
+
+
+hdfs-site.xml is used to configure HDFS. Changing the dfs.replication property in hdfs-site.xml will change the default replication for all files placed in HDFS.
+
+You can also change the replication factor on a per-file basis using the Hadoop FS shell.
+
+[training@localhost ~]$ hadoop fs –setrep –w 3 /my/file
+Alternatively, you can change the replication factor of all the files under a directory.
+
+[training@localhost ~]$ hadoop fs –setrep –w 3 -R /my/dir
+Hadoop Distributed File System was designed to hold and manage large amounts of data; therefore typical HDFS block sizes are significantly larger than the block sizes you would see for a traditional filesystem (for example, the filesystem on my laptop uses a block size of 4 KB). The block size setting is used by HDFS to divide files into blocks and then distribute those blocks across the cluster. For example, if a cluster is using a block size of 64 MB, and a 128-MB text file was put in to HDFS, HDFS would split the file into two blocks (128 MB/64 MB) and distribute the two chunks to the data nodes in the cluster.
+
+Open the hdfs-site.xml file. This file is usually found in the conf/ folder of the Hadoop installation directory.Set the following property in hdfs-site.xml:
+
+<property> 
+<name>dfs.block.size<name> 
+<value>134217728<value> 
+<description>Block size<description> 
+<property>
+
+
+hdfs-site.xml is used to configure HDFS. Changing the dfs.block.size property in hdfs-site.xml will change the default block size for all the files placed into HDFS. In this case, we set the dfs.block.size to 128 MB. Changing this setting will not affect the block size of any files currently in HDFS. It will only affect the block size of files placed into HDFS after this setting has taken effect.
+
+
+================================
+Ddfs.block.size=XX /path/to/inputdata(Source) /path/to/inputdata-with-largeblocks(Destination).
+
+
+To configure the data block at Cluster level we need to specify in the hdfs.site.xml, eg. For 128 mb,value will be 128*1024*1024
+<property>
+    <name>dfs.block.size</name>
+    <value>134217728</value>
+    <description>Block size</description>
+</property>
+
+
+
+
+
+hadoop fs -D fs.local.block.size=134217728 -put local_name remote_location
+
+In conf/ folder we can change the value of dfs.block.size in configuration file hdfs-site.xml. In hadoop version 1.0 default size is 64MB and in version 2.0 default size is 128MB.
+
+<property> 
+    <name>dfs.block.size<name> 
+    <value>134217728<value> 
+    <description>Block size<description> 
+<property>
+

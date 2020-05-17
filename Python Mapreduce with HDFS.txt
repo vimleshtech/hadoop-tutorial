@@ -1,0 +1,43 @@
+
+Libraries dependency
+========================
+import pandas as pd
+from hdfs import InsecureClient
+import os
+
+
+WEBHDFS URI
+WEBHDFS URI are like that : http://namenodedns:port/user/hdfs/folder/file.csv
+
+Default port is 50070
+
+
+Connection
+==============
+# Connecting to Webhdfs by providing hdfs host ip and webhdfs port (50070 by default)
+client_hdfs = InsecureClient('http://' + os.environ['IP_HDFS'] + ':50070')
+
+
+How to write a file to HDFS with Python ?
+
+
+
+Code example
+# Creating a simple Pandas DataFrame
+liste_hello = ['hello1','hello2']
+liste_world = ['world1','world2']
+df = pd.DataFrame(data = {'hello' : liste_hello, 'world': liste_world})
+ 
+# Writing Dataframe to hdfs
+with client_hdfs.write('/user/hdfs/wiki/helloworld.csv', encoding = 'utf-8') as writer:
+    df.to_csv(writer)
+
+
+
+
+===============
+How to read a file from HDFS with Python ?
+Code example
+# ====== Reading files ======
+with client_hdfs.read('/user/hdfs/wiki/helloworld.csv', encoding = 'utf-8') as reader:
+    df = pd.read_csv(reader,index_col=0)

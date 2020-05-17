@@ -1,0 +1,30 @@
+public class IsOfAge extends FilterFunc {
+@Override
+publicBoolean exec(Tuple tuple) throwsIOException {
+if(tuple == null|| tuple.size() == 0) {
+returnfalse;
+}
+try{
+Object object= tuple.get(0);
+if(object == null) {
+returnfalse;
+}
+inti = (Integer) object;
+if(i == 18 || i == 19 || i == 21 || i == 23 || i == 27) {
+returntrue;
+} else{
+returnfalse;
+}
+} catch(ExecExceptione) {
+thrownewIOException(e);
+}
+}
+}
+
+===========
+How to Call a Pig UDF?
+Once a UDF is created, the following command has to be used to register the JAR file.
+
+register myudf.jar;
+X = filter A by IsOfAge(age);
+

@@ -1,0 +1,35 @@
+Download Pig tar file.
+
+$wget http://www-us.apache.org/dist/pig/pig-0.16.0/pig-0.16.0.tar.gz
+
+
+Extract the tar file using tar command. In below tar command, x means extract an archive file, z means filter an archive through gzip, f means filename of an archive file.
+
+$tar -xzf pig-0.16.0.tar.gz 
+
+Edit the “.bashrc” file to update the environment variables of Apache Pig. We are setting it so that we can access pig from any directory, we need not go to pig directory to execute pig commands. Also, if any other application is looking for Pig, it will get to know the path of Apache Pig from this file.
+
+$sudo gedit .bashrc
+
+Add the following at the end of the file:
+
+# Set PIG_HOME
+
+export PIG_HOME=/home/tv/pig-0.16.0
+export PATH=$PATH:/home/tv/pig-0.16.0/bin
+export PIG_CLASSPATH=$HADOOP_CONF_DIR
+
+
+$source .bashrc
+$pig -version
+$pig -help
+
+--Run Pig to start the grunt shell. Grunt shell is used to run Pig Latin scripts
+$pig
+
+
+Execution modes in Apache Pig:
+MapReduce Mode – This is the default mode, which requires access to a Hadoop cluster and HDFS installation. Since, this is a default mode, it is not necessary to specify -x flag ( you can execute pig OR pig -x mapreduce). The input and output in this mode are present on HDFS.
+Local Mode – With access to a single machine, all files are installed and run using a local host and file system. Here the local mode is specified using ‘-x flag’ (pig -x local). The input and output in this mode are present on local file system.
+
+$pig -x local

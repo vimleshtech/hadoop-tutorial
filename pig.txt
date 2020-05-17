@@ -1,0 +1,138 @@
+-14.3
+
+Order By:
+---
+Relation_name2 = ORDER Relatin_name1 BY (ASC|DESC);
+
+limit 	ns1;
+
+---------
+limit_data = LIMIT student_details 4; 
+
+
+Distinct : nse2
+-----------
+distinct_data = DISTINCT student;
+
+
+Foreach : loop :
+------------------------
+ foreach_data = FOREACH student GENERATE id,age,city;
+
+
+Function
+-----------------
+
+S.N. 	Function & Description
+1 	AVG()
+
+To compute the average of the numerical values within a bag.
+2 	BagToString()
+
+To concatenate the elements of a bag into a string. While concatenating, we can place a delimiter between these values (optional).
+3 	CONCAT()
+
+To concatenate two or more expressions of same type.
+4 	COUNT()
+
+To get the number of elements in a bag, while counting the number of tuples in a bag.
+5 	COUNT_STAR()
+
+It is similar to the COUNT() function. It is used to get the number of elements in a bag.
+6 	DIFF()
+
+To compare two bags (fields) in a tuple.
+7 	IsEmpty()
+
+To check if a bag or map is empty.
+8 	MAX()
+
+To calculate the highest value for a column (numeric values or chararrays) in a single-column bag.
+9 	MIN()
+
+To get the minimum (lowest) value (numeric or chararray) for a certain column in a single-column bag.
+10 	PluckTuple()
+
+Using the Pig Latin PluckTuple() function, we can define a string Prefix and filter the columns in a relation that begin with the given prefix.
+11 	SIZE()
+
+To compute the number of elements based on any Pig data type.
+12 	SUBTRACT()
+
+To subtract two bags. It takes two bags as inputs and returns a bag which contains the tuples of the first bag that are not in the second bag.
+13 	SUM()
+
+To get the total of the numeric values of a column in a single-column bag.
+14 	TOKENIZE()
+
+To split a string (which contains a group of words) in a single tuple and return a bag which contains the output of th
+
+e split operation.
+s removed.
+
+
+1 	ToDate(milliseconds)
+
+This function returns a date-time object according to the given parameters. The other alternative for this function are ToDate(iosstring), ToDate(userstring, format), ToDate(userstring, format, timezone)
+2 	CurrentTime()
+
+returns the date-time object of the current time.
+3 	GetDay(datetime)
+
+Returns the day of a month from the date-time object.
+4 	GetHour(datetime)
+
+Returns the hour of a day from the date-time object.
+5 	GetMilliSecond(datetime)
+
+Returns the millisecond of a second from the date-time object.
+6 	GetMinute(datetime)
+
+Returns the minute of an hour from the date-time object.
+7 	GetMonth(datetime)
+
+Returns the month of a year from the date-time object.
+8 	GetSecond(datetime)
+
+Returns the second of a minute from the date-time object.
+9 	GetWeek(datetime)
+
+Returns the week of a year from the date-time object.
+10 	GetWeekYear(datetime)
+
+Returns the week year from the date-time object.
+11 	GetYear(datetime)
+
+Returns the year from the date-time object.
+12 	AddDuration(datetime, duration)
+
+Returns the result of a date-time object along with the duration object.
+13 	SubtractDuration(datetime, duration)
+
+Subtracts the Duration object from the Date-Time object and returns the result.
+14 	DaysBetween(datetime1, datetime2)
+
+Returns the number of days between the two date-time objects.
+15 	HoursBetween(datetime1, datetime2)
+
+Returns the number of hours between two date-time objects.
+16 	MilliSecondsBetween(datetime1, datetime2)
+
+Returns the number of milliseconds between two date-time objects.
+17 	MinutesBetween(datetime1, datetime2)
+
+Returns the number of minutes between two date-time objects.
+18 	MonthsBetween(datetime1, datetime2)
+
+Returns the number of months between two date-time objects.
+19 	SecondsBetween(datetime1, datetime2)
+
+Returns the number of seconds between two date-time objects.
+20 	WeeksBetween(datetime1, datetime2)
+
+Returns the number of weeks between two date-time objects.
+21 	YearsBetween(datetime1, datetime2)
+
+Returns the number of years between two date-time objects.
+
+
